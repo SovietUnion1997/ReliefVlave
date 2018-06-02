@@ -1,0 +1,87 @@
+\documentclass{myart}
+\usepackage{abstract}
+\usepackage{multirow}
+% 画方块图的包
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows}
+\usepackage{verbatim}
+
+\begin{document}
+
+
+\tikzset{%
+  block/.style    = {draw, thick, rectangle, minimum height = 3em,
+    minimum width = 3em},
+  sum/.style      = {draw, circle, node distance = 2cm}, % Adder
+  input/.style    = {coordinate}, % Input
+  output/.style   = {coordinate}, % Output
+  pinstyle/.style = {pin edge={to-,thin,black}},
+}
+
+%\newpage
+\newcommand{\myvec}[1]%
+   {\stackrel{\raisebox{-2pt}[0pt][0pt]{\small$\rightharpoonup$}}{#1}}
+\renewcommand\figurename{图} %使用中文图
+\renewcommand\tablename{表} %使用中文表
+\renewcommand\listfigurename{插\ 图\ 目\ 录} % 对List of Figures进行汉化为插图目录
+\renewcommand\listtablename{表\ 格\ 目\ 录}  % 对List of Tables进行汉化表格目录
+ 
+\renewcommand {\thetable} {\thesection{}.\arabic{table}}
+\renewcommand {\thefigure} {\thesection{}.\arabic{figure}} 
+ % 让图表编号跟随section
+\renewcommand{\contentsname}{目\ 录} %使用中文目录
+\renewcommand{\refname}{参考文献} %使用中文目录
+\numberwithin{equation}{section} % 公式按章节编号
+
+
+
+
+% \newcommand{\loflabel}{Tab.}%在图目录编号前添加Tab.
+%\pagestyle{plain}  %设置页面格式为没有页眉，页码显示在页脚中部
+ 
+
+\thispagestyle{empty}
+
+
+\title{路溢流阀分析}
+% 如果标题一行写不下，就写成两行，在下面的命令里写第二行，不需要两行则注释掉
+%\titletl{第一版}
+
+%英文题目，英文题目如果没有可以注释掉
+%\Etitle{\LaTeX{} Template}
+% 如果一行写不下，同中文题目设定，一行写不下则写两行，不需要就注释掉
+%\Etitletl{The Second Edition}
+% 作者
+
+
+\author{帅青}
+\studentnum{3150105533}
+\supervisor{顾临怡}
+\major{机械电子工程}
+\institute{机械工程学院}
+% 生成封面
+\makeCoverPage
+
+\pagenumbering{arabic}
+\pagestyle{empty}
+\thispagestyle{empty}
+\newpage
+% \tableofcontents
+% \thispagestyle{empty}
+% \newpage 
+% \listoffigures
+% \thispagestyle{empty}
+% \listoftables
+\setcounter{page}{1}
+\newpage
+\graphicspath{{./pic/}{./pic/lqi/}{./pic/modelbuild/}{./pic/statespace/}{./pic/pid/}}
+
+      
+\pagestyle{plain}
+
+\input{./main/main.tex}
+
+% \addcontentsline{toc}{section}{参考文献} 
+\input{./main/bib.tex}
+
+\end{document} 

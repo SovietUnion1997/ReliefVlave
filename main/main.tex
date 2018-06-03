@@ -1,25 +1,172 @@
+用下图所示的电磁铁代替路溢流阀的先导级，入口接到PB位置，保留原先导级的R1与R3，画出新阀的传递函数框图、化简，分析先导级位移、主级速度和溢流压力三个闭环的固有频率、阻尼比高低，比较新阀和路溢流阀在先导级和主级稳定性两方面的优劣。
 
+\section{先导级分析}
+先导阀阀芯与衔铁组件的力平衡
+
+容腔$V_5$的流量连续性方程
+\begin{equation}
+    q_4 + A_5\frac{dy}{dt} = \frac{V_5}{\beta_e}\frac{dp_5}{dt}
+\end{equation}
+
+容腔$V_4$的流量连续性方程
+\begin{equation}
+    q_3 =q_4 + A_4\frac{dy}{dt} + \frac{V_4}{\beta_e}\frac{dp_4}{dt}
+\end{equation}
+
+容腔$V_3$的流量连续性方程
+\begin{equation}
+    q_2 =q_3 + q_y + A_3\frac{dy}{dt} + \frac{V_3}{\beta_e}\frac{dp_3}{dt}
+\end{equation}
+
+
+\section{主阀芯分析}
+主阀芯受力情况：
+\begin{equation}
+    m\frac{d^2 x}{dt^2} = A_4p_A-A_3p_C
+\end{equation}
+进行拉式变换得到
+\begin{equation}
+    ms^2X = A_4P_A-A_3P_C
+\end{equation}
+主阀芯容腔流量连续性方程
+\begin{equation}
+    \frac{V_A}{\beta_e}\frac{dp_A}{dt} = -K_Cp_A-K_qx-A_4\frac{dx}{dt}-\frac{p_A}{R_L}
+\end{equation}
+进行拉式变换得到
+
+\begin{equation}
+    \frac{V_As}{\beta_e}P_A = -K_cP_A-K_qX-A_4sX-\frac{1}{R_L}P_A
+\end{equation}
+
+画出主阀芯的传递函数框图，如图所示
 % The block diagram code is probably more verbose than necessary
 \begin{center}
     \begin{tikzpicture}[auto, node distance=2cm,>=latex']
         % We start by placing the blocks
         \node [input, name=input] {};
-        \node [sum, right of=input] (sum) {};
-        \node [block, right of=sum] (controller) {Controller};
-        \node [block, right of=controller, pin={[pinstyle]above:Disturbances},
-                node distance=3cm] (system) {System};
-        % We draw an edge between the controller and system block to 
+        \node [block,right of=input](A3){$A_3$};
+        \node [sum, right of=A3] (sum) {};
+        \node [block, right of=sum] (mech) {$-\dfrac{1}{ms^2}$};
+        \node [block, right of=mech,node distance= 3cm] (system) {$-\dfrac{K_q+A_4s}{\frac{V_As}{\beta_e}+K_c+\frac{1}{R_L}}$};
+        % We draw an edge between the mech and system block to  
         % calculate the coordinate u. We need it to place the measurement block. 
-        \draw [->] (controller) -- node[name=u] {$u$} (system);
-        \node [output, right of=system] (output) {};
-        \node [block, below of=u] (measurements) {Measurements};
+        \draw [->] (mech) -- node[name=x] {$x$} (system);
+        \node [output, right of=system,node distance= 3cm] (output) {};
+        \node [block, below of=x] (measurements) {$A_4$};
      
         % Once the nodes are placed, connecting them is easy. 
-        \draw [draw,->] (input) -- node {$r$} (sum);
-        \draw [->] (sum) -- node {$e$} (controller);
-        \draw [->] (system) -- node [name=y] {$y$}(output);
+        \draw [draw,->] (input) -- node {$P_C$}(A3);
+        \draw [draw,->] (A3) -- node {$P_C$} (sum);
+        \draw [->] (sum) -- node {} (mech);
+        \draw [->] (system) -- node [name=y] {$P_A$}(output);
         \draw [->] (y) |- (measurements);
         \draw [->] (measurements) -| node[pos=0.99] {$-$}  
-            node [near end] {$y_m$} (sum);
+            node [near end] {} (sum);
+    \end{tikzpicture}
+\end{center}
+
+\newcommand{\RightBlock}[5]{\node[block,right of = #1](#2){$#3$};\draw [->] (#1) -- node [name = #4,above]{$#5$} (#2);}
+
+\newcommand{\BelowBlock}[3]{\node[block,below of = #1](#2){$#3$}}
+\newcommand{\AboveBlock}[3]{\node[block,above of = #1](#2){$#3$}}
+\newcommand{\RightBlockBig}[5]{\node[block,right of = #1,node distance = 2.5cm](#2){$#3$};\draw [->] (#1) -- node [name = #4,above]{$#5$} (#2);}
+\newcommand{\RightBlockLarge}[5]{\node[block,right of = #1,node distance = 3.5cm](#2){$#3$};\draw [->] (#1) -- node [name = #4,above]{$#5$} (#2);}
+\newcommand{\RightBlockMid}[5]{\node[block,right of = #1,node distance = 2cm](#2){$#3$};\draw [->] (#1) -- node [name = #4,above]{$#5$} (#2);}
+
+\newcommand{\Sum}[2]{\node[sum,right of=#1](#2){};\draw [->] (#1) -- node{} (#2);}
+\newcommand{\SumBig}[2]{\node[sum,right of=#1,node distance = 2cm](#2){};\draw [->] (#1) -- node{} (#2);}
+
+\newcommand{\link}[2]{\draw [->] (#1) |-(#2)}
+\newcommand{\linkp}[2]{\draw [->] (#1) -| node[pos = 0.98] {+}(#2)}
+\newcommand{\linkm}[2]{\draw [->] (#1) -| node[pos = 0.98] {-} (#2)}
+
+\newpage
+\begin{center}
+    \begin{tikzpicture}[global scale=0.45]
+        % 前向通道
+        \node [input, name=input] {$F_{EM}$};
+        \Sum{input}{sum};
+        \RightBlock{sum}{mys2}{-\frac{1}{m_ys^2}}{}{};
+        \AboveBlock{mys2}{a5f}{-A_5};
+        \AboveBlock{a5f}{a4f}{A_4};
+        \AboveBlock{a4f}{a3f}{A_3};
+
+        \RightBlock{mys2}{A5s}{A_5s}{Ly}{y};
+        \Sum{A5s}{sum2};
+        \RightBlock{sum2}{p5}{\dfrac{1}{\frac{V_5}{\beta_e}s+\frac{1}{R_4}}}{}{};
+        \AboveBlock{p5,node distance=2cm}{R4f}{-\frac{1}{R_4}};
+        \BelowBlock{p5}{A4s}{-A_4s};
+        \BelowBlock{A4s}{kqy}{-(K_{qy}+A_3s)};
+
+        \RightBlockMid{p5}{R4}{\frac{1}{R_4}}{Lp5}{p_5};
+        \Sum{R4}{sum3};
+        \RightBlockBig{sum3}{p4}{{\dfrac{1}{\frac{V_4}{\beta_e}s+\frac{1}{R_3}+\frac{1}{R_4}}}}{}{};
+        \AboveBlock{p4,node distance=2.5cm}{R3f}{-\frac{1}{R_3}};
+
+        \RightBlockBig{p4}{R3}{\frac{1}{R3}}{Lp4}{p_4};  
+        \Sum{R3}{sum4};  
+        \RightBlockBig{sum4}{p3}{{\dfrac{1}{\frac{V_3}{\beta_e}s+K_{cy}+\frac{1}{R_2}+\frac{1}{R_3}}}}{}{};
+        \AboveBlock{p3,node distance=3cm}{R2f}{-\frac{1}{R_2}};
+
+        \RightBlockLarge{p3}{R2}{-\frac{1}{R_2}}{Lp3}{p_3};
+        \Sum{R2}{sum5};
+        \RightBlock{sum5}{Acs}{\frac{1}{A_Cs}}{}{};
+        \RightBlockMid{Acs}{sx}{K_q+A_As}{Lx}{x};
+        \SumBig{sx}{sum6};
+        \RightBlock{sum6}{R1}{R_1}{}{};
+        \RightBlock{R1}{Ac}{A_C}{Lpc}{p_C};
+        \Sum{Ac}{sum7};
+        \RightBlock{sum7}{Aa}{\frac{1}{A_A}}{}{};
+        \node [output, right of=Aa,node distance= 2cm] (output) {};
+        \draw [->] (Aa) -- node [name=Lpa,above] {$P_A$}(output);
+        % % P_c反馈通道
+        \BelowBlock{Acs,node distance=2.5cm}{pcf1}{\frac{V_C}{\beta_e}s+\frac{1}{R_1}+\frac{1}{R_2}};
+ 
+        % paf   
+        \BelowBlock{Ac}{mxs2}{m_xs^2};
+        \AboveBlock{Acs,node distance =2cm}{paf}{\frac{1}{R_1}};
+        \AboveBlock{Ac}{paf2}{-(\frac{V_A}{\beta_e}s+K_{c}+\frac{1}{R_1}+\frac{1}{R_L})};
+ 
+        % %pcf
+        % \BelowBlock{Acs}{pcf1}{\frac{V_A}{\beta_e}s+K_{c}+\frac{1}{R_1}+\frac{1}{R_L}};
+        % 前向通道连线
+
+        % sum 
+        \draw [->] (a3f) -| node[pos = 0.98] {-} (sum);
+        \draw [->] (a4f) -| node[pos = 0.98] {-} (sum);
+        \draw [->] (a5f) -| node[pos = 0.98] {-} (sum);
+        \link{Lp5}{a5f};
+        \link{Lp4}{a4f};
+        \link{Lp3}{a3f};
+
+        % sum2
+        \draw [->] (R4f) -| node[pos = 0.98] {-} (sum2);
+        \link{Lp4}{R4f};
+        % sum3
+        \draw [->] (R3f) -| node[pos = 0.98] {-} (sum3);
+        \link{Lp3}{R3f};
+        \link{Ly}{A4s};
+        \link{Ly}{kqy};
+        \linkp{A4s}{sum3};
+
+        % sum4
+        \draw [->] (R2f) -| node[pos = 0.98] {-} (sum4);
+        \link{Lpc}{R2f};
+        \linkp{kqy}{sum4};
+
+        % sum5
+        \draw [->] (paf) -| node[pos = 0.98] {-} (sum5);
+        \link{Lpa}{paf};
+        \linkp{pcf1}{sum5};
+        \link{Lpc}{pcf1};
+
+        % sum6
+        \draw [->] (paf2) -| node[pos = 0.98] {-} (sum6);
+        \link{Lpa}{paf2};
+
+        % sum7
+        \link{Lx}{mxs2};
+        \linkp{mxs2}{sum7};
+
     \end{tikzpicture}
 \end{center}
